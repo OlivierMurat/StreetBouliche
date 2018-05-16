@@ -12,10 +12,20 @@ const config = {
         publicPath   : "/"
     },
     resolve  : {
-        extensions: [".js", ".jsx", "*"]
+        extensions: [".js", ".jsx", "*"],
+        alias     : {
+            createjs: "createjs/builds/1.0.0/createjs.js"
+        }
     },
     module   : {
         rules: [
+            {
+                test   : /node_modules[/\\]createjs/,
+                loaders: [
+                    "imports-loader?this=>window",
+                    "exports-loader?window.createjs"
+                ]
+            },
             {
                 test      : /\.jsx?$/, use: [
                     {
@@ -45,8 +55,8 @@ const config = {
                 loader: "url?limit=10000&mimetype=image/svg+xml"
             },
             {
-                test: /\.mp3$/,
-                loader: 'file-loader'
+                test  : /\.mp3$/,
+                loader: "file-loader"
             },
             {
                 test: /\.(gif|png|jpe?g|svg)$/i,

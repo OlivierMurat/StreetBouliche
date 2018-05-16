@@ -194,6 +194,8 @@ function init() {
     stage.addChild(bg);
     stage.update();
 
+    window.stage = stage;
+
     // On crée le personnage 1
     imgPerso1.src = spriteChar1;
     imgPerso1.onload = createPlayer("a", spriteChar1);

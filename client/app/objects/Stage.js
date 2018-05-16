@@ -2,6 +2,7 @@ import themeSong             from "../assets/sound/theme.mp3";
 import ToulouseYnovCampusPNG from "../assets/images/Toulouse-YnovCampus.png";
 import SpriteKen             from "../assets/images/spriteKen.png";
 import SpriteRyu             from "../assets/images/spriteRyu.png";
+import Ken                   from "./characters/ken";
 import Player                from "./player";
 
 export default class Stage {
@@ -11,32 +12,89 @@ export default class Stage {
     partyFinish = false;
     players = [];
 
+    keyPressed = [];
+    keyLocked = [
+        "&",
+        "é",
+        "\"",
+        "1",
+        "2",
+        "3"
+    ];
+
+    handleKeyDown(keyPressed){
+        //if not already registered in pressed
+        if(!this.keyPressed.find(key=>key.key===keyPressed)){
+            this.keyPressed.push({key:keyPressed});
+        }
+    }
+
+    handleKeyUp(keyPressed){
+        this.keyPressed = this.keyPressed.filter(key=> key.key !== keyPressed);
+    }
+
     constructor() {
         Stage.Instance = this;
+
+        this.checkKeyPressedInterval = setInterval(()=>{
+            this.checkKeyPressed();
+        },200);
+
         //start theme song
         // createjs.Sound.addEventListener("fileload", this.startThemeSong());
         // this.loadMusics();
     }
 
+    checkKeyPressed(){
+        this.keyPressed.forEach(key=>{
+            //key is locked sometimes, like for punch
+            if(!key.locked){
+                this.handleKeyBoardInput(key.key);
+                if(this.keyLocked.find(lockedKey => lockedKey === key.key)){
+                    key.locked = true;
+                }
+            }
+        })
+    }
+
+
     handleKeyBoardInput(key) {
         this.players.forEach(player => player.handleKeyBoardInput(key));
     }
 
-    init() {
+    tick = ()=>{
+        this.stage.update();
+    };
 
+    init() {
         this.stage = new createjs.Stage("canvas");
+        document.getElementById("canvas").stage = this.stage;
         this.startMusic();
 
         this.setBackground(ToulouseYnovCampusPNG);
 
-        this.players.push(new Player({
-            isLeftTurned: false,
-            spriteImage : SpriteKen
+        this.players.push(new Ken({
+            isLeftTurned: false
         }));
-        // this.player2 = new Player({
-        //     isLeftTurned : true,
-        //     spriteImage: SpriteRyu
-        // });
+
+        this.players.push(new Ken({
+            isLeftTurned: true,
+            bindings: {
+                up     : "ArrowUp",
+                down   : "ArrowDown",
+                right  : "ArrowRight",
+                left   : "ArrowLeft",
+                attack1: "1",
+                attack2: "2",
+                attack3: "3"
+            }
+        }));
+
+
+        // Ticker
+        createjs.Ticker.useRAF = true;
+        createjs.Ticker.setFPS(60);
+        createjs.Ticker.addEventListener("tick", ()=>{this.tick()});
     }
 
     destroy() {
@@ -78,7 +136,10 @@ export default class Stage {
         bg.x = 0;
         bg.y = 0;
 
+        bg.image.onload = () => {
+            this.update();
+        };
+
         this.stage.addChild(bg);
-        this.update();
     }
 }

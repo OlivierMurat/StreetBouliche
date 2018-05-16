@@ -1,4 +1,4 @@
-import 'latest-createjs'
+import createjs from 'createjs';
 import stage    from "./Stage"
 
 export default class SpecialAttack{

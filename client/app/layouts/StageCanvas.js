@@ -1,4 +1,4 @@
-import 'latest-createjs'
+import createjs from 'createjs';
 import React       from "react";
 import errorCanvas from "../assets/images/errorcanvas.png";
 import "../assets/css/canvas.scss"
@@ -13,18 +13,25 @@ export default class StageCanvas extends React.Component {
         window.stage = this.stage;
     }
 
-    handleKeyboardPress(event) {
-        console.log("keyboard : " + event.key);
-        this.stage.handleKeyBoardInput(event.key);
+    handleKeyDown(event){
+        console.log(`keyboard : ${event.key} down`);
+        this.stage.handleKeyDown(event.key);
+    }
+
+    handleKeyUp(event){
+        console.log(`keyboard : ${event.key} up`);
+        this.stage.handleKeyUp(event.key);
     }
 
     componentDidMount() {
         this.stage.init();
-        document.addEventListener("keypress", (event) => this.handleKeyboardPress(event));
+        document.addEventListener("keydown", (event) => this.handleKeyDown(event));
+        document.addEventListener("keyup", (event) => this.handleKeyUp(event));
     }
 
     componentWillUnmount() {
-        document.removeEventListener("keypress", (event) => this.handleKeyboardPress(event));
+        document.removeEventListener("keydown", (event) => this.handleKeyDown(event));
+        document.removeEventListener("keyup", (event) => this.handleKeyUp(event));
 
         this.stage.destroy();
     }
