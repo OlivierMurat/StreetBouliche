@@ -1,0 +1,8 @@
+#canvas {
+    background-color: gray;
+    padding: 0;
+    margin: auto;
+    display: block;
+    width: 1400px;
+    height: 800px;
+}

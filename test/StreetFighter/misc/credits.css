@@ -1,0 +1,18 @@
+html {
+    background-color: #2A2A2A;
+}
+
+#credits {
+    width: 800px;
+    height: 400px;
+    border: 1px solid #4B4B4B;
+    color: dimgrey;
+    border-radius: 6px;
+    margin: auto;
+    font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
+.title {
+    text-align: center;
+    font-size: 20px;
+}
