@@ -1,5 +1,6 @@
-import Player from "../player";
+import Player    from "../player";
 import SpriteKen from "../../assets/images/spriteKen.png";
+import Hadoken   from "../specialAttacks/Hadoken";
 
 export default class Ken extends Player {
     name = "Ken";
@@ -8,6 +9,8 @@ export default class Ken extends Player {
 
     charWidth = 43;
     charHeight = 87;
+
+    specialAttack = new Hadoken();
 
     spriteSheetDatas = {
         // image | spritesheet

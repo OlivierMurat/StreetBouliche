@@ -7,10 +7,17 @@ export default class Player {
     spriteSheetDatas = null;
     charWidth = 0;
     charHeight = 0;
+    /**
+     *
+     * @type {SpecialAttack}
+     */
+    specialAttack = null;
 
     life = 100;
 
     blockAttack = false;
+
+    crouched = false;
 
     bindings = {
         up     : "z",
@@ -33,6 +40,17 @@ export default class Player {
             this.isLeftTurned = params.isLeftTurned;
 
         this.stage = Stage.Instance;
+    }
+
+    getBounds(){
+        let bounds = this.character.getTransformedBounds();
+        if(this.crouched){
+            bounds.height/=2;
+            bounds.y+=bounds.height;
+        }
+
+        console.log(bounds.height, this.crouched);
+        return bounds;
     }
 
     initCharacter() {
@@ -79,24 +97,27 @@ export default class Player {
             case this.bindings.right :
                 this.stand();
                 break;
-            case this.bindings.up :
-                // this.moveUp();
-                break;
+            // case this.bindings.up :
+            //     // this.moveUp();
+            //     break;
             case this.bindings.down:
-                // this.moveDown();
+                this.crouched = false;
+                this.stand();
                 break;
             case this.bindings.attack1:
-                // this.attack(1);
+            //     // this.attack(1);
                 break;
             case this.bindings.attack2:
-                // this.attack(2);
+            //     // this.attack(2);
                 break;
             case this.bindings.attack3:
-                // this.attack(3);
+            //     // this.attack(3);
                 break;
             case this.bindings.block:
                 this.blockEnd();
                 break;
+            default:
+                this.stand()
         }
     }
 
@@ -155,6 +176,7 @@ export default class Player {
             break;
             case 3:
                 console.log("superAttack !!");
+                this.specialAttack.start(this.getBounds(), this.isLeftTurned);
             break;
         }
     }
@@ -165,8 +187,6 @@ export default class Player {
         if(bounds && bounds.x < 3)
             return;
 
-        console.log(this.character.x);
-
         this.walk();
         this.character.x -= 3;
     }
@@ -175,7 +195,7 @@ export default class Player {
         //check movement
         let bounds = this.character.getTransformedBounds();
         let stageWidth = this.character.stage.canvas.width;
-        console.log(bounds.x, stageWidth);
+
         if(bounds && (bounds.x+bounds.width+3) > stageWidth)
             return;
 
@@ -187,6 +207,7 @@ export default class Player {
         // this.character.y -= 3;
     }
     moveDown(){
+        this.crouched = true;
         this.character.gotoAndPlay("down");
     }
 
@@ -198,7 +219,7 @@ export default class Player {
         //check if player is not already blocking
         if(this.blockAttack)
             return;
-        console.log("block");
+
         this.character.gotoAndPlay("block");
         this.blockAttack = true;
     }
