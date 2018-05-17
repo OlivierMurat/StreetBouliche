@@ -1,4 +1,3 @@
-import createjs from 'createjs';
 import React       from "react";
 import errorCanvas from "../assets/images/errorcanvas.png";
 import "../assets/css/canvas.scss"

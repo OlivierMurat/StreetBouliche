@@ -31,6 +31,7 @@ export default class Stage {
 
     handleKeyUp(keyPressed){
         this.keyPressed = this.keyPressed.filter(key=> key.key !== keyPressed);
+        this.handleKeyBoardRelease(keyPressed);
     }
 
     constructor() {
@@ -38,7 +39,7 @@ export default class Stage {
 
         this.checkKeyPressedInterval = setInterval(()=>{
             this.checkKeyPressed();
-        },200);
+        },50);
 
         //start theme song
         // createjs.Sound.addEventListener("fileload", this.startThemeSong());
@@ -52,11 +53,15 @@ export default class Stage {
                 this.handleKeyBoardInput(key.key);
                 if(this.keyLocked.find(lockedKey => lockedKey === key.key)){
                     key.locked = true;
+                    console.log("lock "+key.key)
                 }
             }
         })
     }
 
+    handleKeyBoardRelease(key){
+        this.players.forEach(player => player.handleKeyBoardRelease(key));
+    }
 
     handleKeyBoardInput(key) {
         this.players.forEach(player => player.handleKeyBoardInput(key));
@@ -86,7 +91,8 @@ export default class Stage {
                 left   : "ArrowLeft",
                 attack1: "1",
                 attack2: "2",
-                attack3: "3"
+                attack3: "3",
+                block : "4"
             }
         }));
 
@@ -118,7 +124,7 @@ export default class Stage {
         });
 
         createjs.Sound.registerSound({
-            id : "themeSound",
+            id : "themeSong",
             src: themeSong
         });
     }

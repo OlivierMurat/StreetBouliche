@@ -10,6 +10,8 @@ export default class Player {
 
     life = 100;
 
+    blockAttack = false;
+
     bindings = {
         up     : "z",
         down   : "s",
@@ -17,7 +19,8 @@ export default class Player {
         left   : "q",
         attack1: "&",
         attack2: "é",
-        attack3: "\""
+        attack3: "\"",
+        block : "'"
     };
 
     isLeftTurned = false;
@@ -64,6 +67,39 @@ export default class Player {
         stage.update();
     }
 
+    /**
+     * Action when key is released
+     * @param key
+     */
+    handleKeyBoardRelease(key){
+        switch (key) {
+            case this.bindings.left :
+                this.stand();
+                break;
+            case this.bindings.right :
+                this.stand();
+                break;
+            case this.bindings.up :
+                // this.moveUp();
+                break;
+            case this.bindings.down:
+                // this.moveDown();
+                break;
+            case this.bindings.attack1:
+                // this.attack(1);
+                break;
+            case this.bindings.attack2:
+                // this.attack(2);
+                break;
+            case this.bindings.attack3:
+                // this.attack(3);
+                break;
+            case this.bindings.block:
+                this.blockEnd();
+                break;
+        }
+    }
+
     handleKeyBoardInput(key) {
         switch (key) {
             case this.bindings.left :
@@ -80,18 +116,20 @@ export default class Player {
             break;
             case this.bindings.attack1:
                 this.attack(1);
-                break;
+            break;
             case this.bindings.attack2:
                 this.attack(2);
-                break;
+            break;
             case this.bindings.attack3:
                 this.attack(3);
-                break;
+            break;
+            case this.bindings.block:
+                this.block();
+            break;
         }
     }
 
     walk(){
-
         //setTimeout to end walk
         clearTimeout(this.endWalkTimeout);
         this.endWalkTimeout = setTimeout(()=>{
@@ -122,11 +160,25 @@ export default class Player {
     }
 
     moveLeft() {
+        //check movement
+        let bounds = this.character.getTransformedBounds();
+        if(bounds && bounds.x < 3)
+            return;
+
+        console.log(this.character.x);
+
         this.walk();
         this.character.x -= 3;
     }
 
     moveRight() {
+        //check movement
+        let bounds = this.character.getTransformedBounds();
+        let stageWidth = this.character.stage.canvas.width;
+        console.log(bounds.x, stageWidth);
+        if(bounds && (bounds.x+bounds.width+3) > stageWidth)
+            return;
+
         this.walk();
         this.character.x += 3;
     }
@@ -136,5 +188,23 @@ export default class Player {
     }
     moveDown(){
         this.character.gotoAndPlay("down");
+    }
+
+    stand() {
+        this.character.gotoAndPlay("stand");
+    }
+
+    block() {
+        //check if player is not already blocking
+        if(this.blockAttack)
+            return;
+        console.log("block");
+        this.character.gotoAndPlay("block");
+        this.blockAttack = true;
+    }
+
+    blockEnd(){
+        this.character.gotoAndPlay("stand");
+        this.blockAttack = false;
     }
 }

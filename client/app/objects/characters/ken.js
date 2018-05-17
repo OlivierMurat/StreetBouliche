@@ -46,8 +46,8 @@ export default class Ken extends Player {
             walk : [4, 7, "walk", 0.1],
             punch: [8, 10, "stand", 0.1],
             kick : [11, 13, "stand", 0.1],
-            block: [14, 14, "stand", 0.1],
-            down : [15, 15, "stand", 0.1],
+            block: [14, 14, "block", 0.1],
+            down : [15, 15, "down", 0.1],
             hit  : [16, 19, "stand", 0.1],
             ko   : [20, 22, "ko", 0.1]
         }
