@@ -38,9 +38,9 @@ export default class Ken extends Player {
             [1700, 0, 43, 87], // hit
             [1800, 0, 43, 87], // hit
             [1900, 0, 43, 87], // hit
-            [2000, 0, 43, 87], // ko
-            [2100, 0, 43, 87], // ko
-            [2200, 0, 43, 87] // ko
+            [1999, 0, 45, 87], // ko
+            [2086, 0, 72, 87], // ko
+            [2184, 0, 75, 87] // ko
         ],
         // définition des animations
         animations: {
@@ -52,7 +52,8 @@ export default class Ken extends Player {
             block: [14, 14, "block", 0.1],
             down : [15, 15, "down", 0.1],
             hit  : [16, 19, "stand", 0.1],
-            ko   : [20, 22, "ko", 0.1]
+            ko   : [20, 21, "ko_end", 0.1],
+            ko_end   : [22, 22, "ko_end", 0.1]
         }
     };
 
