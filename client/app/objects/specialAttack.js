@@ -1,4 +1,5 @@
 import createjs from 'createjs';
+import player   from "./player";
 import Stage    from "./Stage"
 
 export default class SpecialAttack{
@@ -16,7 +17,10 @@ export default class SpecialAttack{
         createjs.Ticker.addEventListener("tick", ()=>{this.tick()});
     }
 
-    start(playerBounds, isLeftTurned){
+    start(player, isLeftTurned){
+        this.sender = player;
+        let playerBounds = player.getBounds();
+
         if(this.created)
             return;
 
@@ -31,7 +35,7 @@ export default class SpecialAttack{
         this.sprite.y = playerBounds.y+playerBounds.height/2;
         this.sprite.scaleX = 1.3*this.direction;
         this.sprite.scaleY = 1.3;
-        this.stage.stage.addChild(this.sprite);
+        this.stage.addChild(this.sprite, this);
         this.sprite.gotoAndPlay("stand");
 
         this.moveInterval = setInterval(()=>{
@@ -46,15 +50,34 @@ export default class SpecialAttack{
      * special attack with move to enemy
      */
     move(){
-        //check movement
         let bounds = this.sprite.getTransformedBounds();
+        let a = this.stage.checkColisionWithOtherChildren(bounds).filter(collision=>{
+            let object = collision.o;
+
+            if(object.walk){
+                //its a player
+                return !(this.sender === object);
+            }
+            else{
+                //it's an attack
+                return false;
+            }
+        });
+
+
+        if(a.length>0){
+            //collision
+            console.log("collision !!!");
+            this.destroyAttack()
+        }
+        //check movement
         if(bounds && bounds.x < 3)
-            return this.destroy();
+            return this.destroyAttack();
 
         let stageWidth = this.sprite.stage.canvas.width;
 
         if(bounds && (bounds.x+bounds.width+3) > stageWidth)
-            return this.destroy();
+            return this.destroyAttack();
 
         this.sprite.x+= 3*this.direction;
         this.stage.update();
@@ -67,7 +90,17 @@ export default class SpecialAttack{
         console.log("destroy");
         clearInterval(this.moveInterval);
         this.created = false;
-        this.stage.stage.removeChild(this.sprite);
+        this.stage.removeChild(this.sprite);
         this.stage.update();
+    }
+
+    destroyAttack() {
+        this.sprite.gotoAndPlay("burst");
+        setTimeout(()=>{
+            clearInterval(this.moveInterval);
+            setTimeout(()=>{
+                this.destroy();
+            },300)
+        },150);
     }
 }

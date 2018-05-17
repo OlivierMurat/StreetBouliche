@@ -21,45 +21,60 @@ export default class Stage {
         "2",
         "3"
     ];
+    children = [];
 
-    handleKeyDown(keyPressed){
+    handleKeyDown(keyPressed) {
         //if not already registered in pressed
-        if(!this.keyPressed.find(key=>key.key===keyPressed)){
-            this.keyPressed.push({key:keyPressed});
+        if (!this.keyPressed.find(key => key.key === keyPressed)) {
+            this.keyPressed.push({key: keyPressed});
         }
     }
 
-    handleKeyUp(keyPressed){
-        this.keyPressed = this.keyPressed.filter(key=> key.key !== keyPressed);
+    handleKeyUp(keyPressed) {
+        this.keyPressed = this.keyPressed.filter(key => key.key !== keyPressed);
         this.handleKeyBoardRelease(keyPressed);
+    }
+
+    checkColisionWithOtherChildren(rect) {
+        return this.children.filter(child => child.o.checkCollisions && child.o.checkCollisions(rect));
+    }
+
+    addChild(element, object) {
+        this.stage.addChild(element);
+        this.children.push({el: element, o: object});
+    }
+
+    removeChild(element) {
+        this.stage.removeChild(element);
+        this.children = this.children.filter(child => child.el !== element);
     }
 
     constructor() {
         Stage.Instance = this;
 
-        this.checkKeyPressedInterval = setInterval(()=>{
+        this.checkKeyPressedInterval = setInterval(() => {
             this.checkKeyPressed();
-        },50);
+        }, 50);
 
         //start theme song
         // createjs.Sound.addEventListener("fileload", this.startThemeSong());
         // this.loadMusics();
     }
 
-    checkKeyPressed(){
-        this.keyPressed.forEach(key=>{
+    checkKeyPressed() {
+        this.keyPressed.forEach(key => {
             //key is locked sometimes, like for punch
-            if(!key.locked){
+            if (!key.locked) {
                 this.handleKeyBoardInput(key.key);
-                if(this.keyLocked.find(lockedKey => lockedKey === key.key)){
+                if (this.keyLocked.find(lockedKey => lockedKey === key.key)) {
                     key.locked = true;
-                    console.log("lock "+key.key)
+                    console.log("lock " + key.key);
                 }
             }
-        })
+        });
     }
 
-    handleKeyBoardRelease(key){
+    handleKeyBoardRelease(key) {
         this.players.forEach(player => player.handleKeyBoardRelease(key));
     }
 
@@ -67,7 +82,7 @@ export default class Stage {
         this.players.forEach(player => player.handleKeyBoardInput(key));
     }
 
-    tick = ()=>{
+    tick = () => {
         this.stage.update();
     };
 
@@ -84,7 +99,7 @@ export default class Stage {
 
         this.players.push(new Ken({
             isLeftTurned: true,
-            bindings: {
+            bindings    : {
                 up     : "ArrowUp",
                 down   : "ArrowDown",
                 right  : "ArrowRight",
@@ -92,7 +107,7 @@ export default class Stage {
                 attack1: "1",
                 attack2: "2",
                 attack3: "3",
-                block : "4"
+                block  : "4"
             }
         }));
 
@@ -100,7 +115,7 @@ export default class Stage {
         // Ticker
         createjs.Ticker.useRAF = true;
         createjs.Ticker.setFPS(60);
-        createjs.Ticker.addEventListener("tick", ()=>{this.tick()});
+        createjs.Ticker.addEventListener("tick", () => {this.tick();});
     }
 
     destroy() {
