@@ -6,6 +6,8 @@ export default class Hadoken extends SpecialAttack {
     spriteImage = new Image();
     spriteSheet = HadokenPng;
 
+    damage = 5;
+
     timerMove = 20;
 
     loadSprite() {

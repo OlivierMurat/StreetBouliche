@@ -12,6 +12,16 @@ export default class Ken extends Player {
 
     specialAttack = new Hadoken();
 
+    attack1 = {
+        damage:10,
+        range:10,
+    };
+
+    attack2 = {
+        damage:30,
+        range:20,
+    };
+
     spriteSheetDatas = {
         // image | spritesheet
         images    : [this.spriteImage],

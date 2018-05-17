@@ -35,8 +35,8 @@ export default class Stage {
         this.handleKeyBoardRelease(keyPressed);
     }
 
-    checkColisionWithOtherChildren(rect) {
-        return this.children.filter(child => child.o.checkCollisions && child.o.checkCollisions(rect));
+    checkCollisionWithOtherChildren(rect) {
+        return this.children.filter(child => child.o.checkCollisions && child.o.checkCollisions(rect)).map(child=>child.o);
     }
 
     addChild(element, object) {
@@ -86,6 +86,11 @@ export default class Stage {
         this.stage.update();
     };
 
+    thisPlayerLoose(player){
+        let winner = this.children.find(child => child.o.walk && !(child.o === player));
+        console.log("we have a winner");
+    }
+
     init() {
         this.stage = new createjs.Stage("canvas");
         document.getElementById("canvas").stage = this.stage;
@@ -96,6 +101,8 @@ export default class Stage {
         this.players.push(new Ken({
             isLeftTurned: false
         }));
+
+        // window.test = this.players[0];
 
         this.players.push(new Ken({
             isLeftTurned: true,

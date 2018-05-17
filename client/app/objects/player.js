@@ -13,6 +13,17 @@ export default class Player {
      */
     specialAttack = null;
 
+
+    attack1 = {
+        damage:10,
+        range:10,
+    };
+
+    attack2 = {
+        damage:30,
+        range:20,
+    };
+
     life = 100;
 
     blockAttack = false;
@@ -49,7 +60,6 @@ export default class Player {
             bounds.y += bounds.height;
         }
 
-        console.log(bounds.height, this.crouched);
         return bounds;
     }
 
@@ -97,9 +107,9 @@ export default class Player {
             case this.bindings.right :
                 this.stand();
                 break;
-            // case this.bindings.up :
-            //     // this.moveUp();
-            //     break;
+            case this.bindings.up :
+                this.stand();
+                break;
             case this.bindings.down:
                 this.crouched = false;
                 this.stand();
@@ -116,8 +126,6 @@ export default class Player {
             case this.bindings.block:
                 this.blockEnd();
                 break;
-            default:
-                this.stand();
         }
     }
 
@@ -174,13 +182,48 @@ export default class Player {
                  rect.y + rect.height > bounds.y;
     }
 
+    takeDamage(damages){
+        this.life -= damages;
+
+        console.log("take damage, life : "+this.life);
+
+        if(this.life<=0){
+            this.die();
+            this.stage.thisPlayerLoose(this);
+        }
+        else
+            this.hit();
+    }
+
     attack(id) {
+        let attack = (damage, bounds)=>{
+            let players = this.stage.checkCollisionWithOtherChildren(bounds).filter(collisionObject => {
+                if (collisionObject.walk) {
+                    //its a player
+                    return !(this === collisionObject);
+                }
+                else {
+                    //it's an attack
+                    return false;
+                }
+            });
+
+            if (players.length > 0) {
+                //collision
+                console.log("collision !!!");
+                players.forEach(player => player.takeDamage(damage));
+            }
+        };
+
+        let bounds = this.character.getTransformedBounds();
         switch (id) {
             case 1:
                 this.character.gotoAndPlay("punch");
+                attack(this.attack1.damage, {...bounds,width:bounds.width+this.attack1.range});
                 break;
             case 2:
                 this.character.gotoAndPlay("kick");
+                attack(this.attack2.damage, {...bounds,width:bounds.width+this.attack2.range});
                 break;
             case 3:
                 console.log("superAttack !!");
@@ -236,5 +279,12 @@ export default class Player {
     blockEnd() {
         this.character.gotoAndPlay("stand");
         this.blockAttack = false;
+    }
+
+    hit(){
+        this.character.gotoAndPlay("hit");
+    }
+    die(){
+        this.character.gotoAndPlay("ko");
     }
 }
