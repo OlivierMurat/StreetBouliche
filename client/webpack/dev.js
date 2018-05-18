@@ -55,7 +55,7 @@ const config = {
                 loader: "url?limit=10000&mimetype=image/svg+xml"
             },
             {
-                test  : /\.mp3$/,
+                test  : /\.(mp3|ogg)$/,
                 loader: "file-loader"
             },
             {

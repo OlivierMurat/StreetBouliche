@@ -141,7 +141,7 @@ export default class Player {
                 this.moveUp();
                 break;
             case this.bindings.down:
-                this.moveDown();
+                this.moveCrouched();
                 break;
             case this.bindings.attack1:
                 this.attack(1);
@@ -158,7 +158,28 @@ export default class Player {
         }
     }
 
+    /**
+     * player can perform a action
+     *
+     * @param action
+     * @returns {boolean}
+     */
+    canDoAction(action){
+        console.log("canDoAction "+action);
+        if(this.crouched && (action !== "takeDamage" && action !== "die"))
+            return false;
+
+        //si il est mort
+        if(this.life<=0)
+            return false;
+
+        return true;
+    }
+
     walk() {
+        if(!this.canDoAction("walk"))
+            return;
+
         //setTimeout to end walk
         clearTimeout(this.endWalkTimeout);
         this.endWalkTimeout = setTimeout(() => {
@@ -183,6 +204,10 @@ export default class Player {
     }
 
     takeDamage(damages){
+        debugger;
+        if(!this.canDoAction("takeDamage"))
+            return;
+
         this.life -= damages;
 
         console.log("take damage, life : "+this.life);
@@ -196,6 +221,9 @@ export default class Player {
     }
 
     attack(id) {
+        if(!this.canDoAction("attack"))
+            return;
+
         let attack = (damage, bounds)=>{
             let players = this.stage.checkCollisionWithOtherChildren(bounds).filter(collisionObject => {
                 if (collisionObject.walk) {
@@ -233,6 +261,9 @@ export default class Player {
     }
 
     moveLeft() {
+        if(!this.canDoAction("move"))
+            return;
+
         //check movement
         let bounds = this.character.getTransformedBounds();
         if (bounds && bounds.x < 3)
@@ -243,6 +274,9 @@ export default class Player {
     }
 
     moveRight() {
+        if(!this.canDoAction("move"))
+            return;
+
         //check movement
         let bounds = this.character.getTransformedBounds();
         let stageWidth = this.character.stage.canvas.width;
@@ -255,19 +289,28 @@ export default class Player {
     }
 
     moveUp() {
+        if(!this.canDoAction("move"))
+            return;
         // this.character.y -= 3;
     }
 
-    moveDown() {
+    moveCrouched() {
+        if(!this.canDoAction("crouched"))
+            return;
         this.crouched = true;
         this.character.gotoAndPlay("down");
     }
 
     stand() {
+        if(!this.canDoAction("stand"))
+            return;
+
         this.character.gotoAndPlay("stand");
     }
 
     block() {
+        if(!this.canDoAction("block"))
+            return;
         //check if player is not already blocking
         if (this.blockAttack)
             return;
@@ -282,9 +325,13 @@ export default class Player {
     }
 
     hit(){
+        if(!this.canDoAction("hit"))
+            return;
         this.character.gotoAndPlay("hit");
     }
     die(){
+        if(!this.canDoAction("die"))
+            return;
         this.character.gotoAndPlay("ko");
     }
 }
