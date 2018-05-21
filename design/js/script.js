@@ -1,4 +1,4 @@
-var spriteChar1 = "../design/images/spriteKen.png";
+var spriteChar1 = "../design/images/sprite.png";
 var spriteChar2 = "../design/images/spriteRyu.png";
 
 var stage,

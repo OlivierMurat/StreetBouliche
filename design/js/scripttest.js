@@ -1,4 +1,4 @@
-var spritePerso1 = "../design/images/spriteKen.png";
+var spritePerso1 = "../design/images/sprite.png";
 var spritePerso2 = "../design/images/spriteRyu.png";
 var spriteAttack = "../design/images/hadoken.png";
 

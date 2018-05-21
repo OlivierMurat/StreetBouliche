@@ -2,15 +2,15 @@ import themeSong             from "../assets/sound/theme1.ogg";
 import fightSong             from "../assets/sound/effects/fight.mp3";
 import roundSong             from "../assets/sound/effects/round.mp3";
 import ToulouseYnovCampusPNG from "../assets/images/Toulouse-YnovCampus.png";
-import SpriteKen             from "../assets/images/spriteKen.png";
+import SpriteKen             from "../assets/characters/ken/sprite.png";
 import SpriteRyu             from "../assets/images/spriteRyu.png";
 import SpriteHadoken         from "../assets/images/hadoken.png";
+import characterFactory      from "./characters/factory";
 import Ken                   from "./characters/ken";
 import EventEmitter          from "./EventEmitter";
 import Player                from "./player";
 import {Howl}                from "howler";
-
-import * as PIXI from "pixi.js";
+import * as PIXI             from "pixi.js";
 
 export default class Stage extends EventEmitter {
 
@@ -75,10 +75,10 @@ export default class Stage extends EventEmitter {
 
         //add all assets to preload
         this.loader
-            .add("ToulouseYnovCampusPNG", ToulouseYnovCampusPNG)
+            // .add("ToulouseYnovCampusPNG", ToulouseYnovCampusPNG)
             .add("SpriteHadoken", SpriteHadoken)
-            .add("SpriteKen", SpriteKen)
-            .add("SpriteRyu", SpriteRyu)
+            .add("Sprite-ken", SpriteKen)
+            .add("Sprite-ryu", SpriteRyu)
             .add("themeSong", themeSong)
             .add("fightSong", fightSong)
             .add("roundSong", roundSong);
@@ -88,6 +88,7 @@ export default class Stage extends EventEmitter {
 
         //debug
         window.stage = this;
+        window.checkCharacter = this.checkCharacter;
     }
 
     checkKeyPressed() {
@@ -112,7 +113,7 @@ export default class Stage extends EventEmitter {
     }
 
     tick = () => {
-        this.stage.update();
+        // this.stage.update();
     };
 
     thisPlayerLoose(player) {
@@ -132,6 +133,8 @@ export default class Stage extends EventEmitter {
                 view  : params.canvas || document.getElementById("canvas")
             });
 
+            this.app.renderer.autoResize = true;
+
             //add themeSong
             this.themeSong = new Howl({
                 src     : [themeSong],
@@ -146,9 +149,14 @@ export default class Stage extends EventEmitter {
 
             this.setBackground(ToulouseYnovCampusPNG);
 
-            // this.players.push(new Ken({
+            // let player = characterFactory.getCharacter("ken", {
             //     isLeftTurned: false
-            // }));
+            // });
+
+            this.stage = this.app.stage;
+            // player.initCharacter();
+
+            // this.players.push(player);
 
             // window.test = this.players[0];
 
@@ -179,6 +187,37 @@ export default class Stage extends EventEmitter {
 
     }
 
+    checkCharacter = (charName) => {
+
+        if(this.testPlayers){
+            this.testPlayers.forEach(player => {
+                player.destroy();
+            });
+        }
+        let players = [];
+        let player = characterFactory.getCharacter(charName);
+
+        players.push(player);
+        let x = 0;
+
+        //get one player by animations
+        for (let name in player.sprite.animations) {
+            let curPlayer = characterFactory.getCharacter(charName);
+            curPlayer.initCharacter();
+
+            curPlayer.sprite.animationLocked = true;
+
+            curPlayer.sprite.setAnimation(name);
+
+            curPlayer.debug = true;
+            curPlayer.x = x;
+
+            x += curPlayer.sprite.getBounds().width + 50;
+            players.push(curPlayer);
+        }
+        this.testPlayers = players;
+    };
+
     startMusic() {
         this.themeSong.play();
 
@@ -198,11 +237,19 @@ export default class Stage extends EventEmitter {
     }
 
     update(...args) {
-        return this.stage.update(...args);
+        // return this.stage.update(...args);
     }
 
     setBackground(background) {
-        this.backgroundSprite = new PIXI.Sprite.fromImage(background);
+
+        let texture = PIXI.utils.TextureCache[background];
+
+        if (!texture) {
+            this.backgroundSprite = PIXI.Sprite.fromImage(background);
+        }
+        else {
+            this.backgroundSprite = new PIXI.Sprite(texture);
+        }
 
         let imageRatio = this.backgroundSprite.width / this.backgroundSprite.height;
         let containerRatio = this.app.renderer.width / this.app.renderer.height;

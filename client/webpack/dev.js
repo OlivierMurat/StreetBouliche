@@ -12,7 +12,7 @@ const config = {
         publicPath   : "/"
     },
     resolve  : {
-        extensions: [".js", ".jsx", "*"],
+        extensions: [".js", ".jsx", ".json", "*"],
         alias     : {
             createjs: "createjs/builds/1.0.0/createjs.js"
         }
