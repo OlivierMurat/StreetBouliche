@@ -1,16 +1,54 @@
 import player from "../player";
+
+//use this import, else webpack while remove !
 import kenConfiguration from "../../assets/characters/ken/character";
 import ryuConfiguration from "../../assets/characters/ryu/character";
 import SpriteKen             from "../../assets/characters/ken/sprite.png";
 import SpriteRyu             from "../../assets/images/spriteRyu.png";
 
-export default class characterFactory {
+export default class CharacterFactory {
 
-    //always in lowerCase
+    /**
+     *
+     * @type {{name:string,configuration:*,spriteSheet:string}[]}
+     */
     static playersAvailable = [
-        "ken",
-        "ryu"
+        {
+            name : "ken",
+            configuration : kenConfiguration,
+            spriteSheet: SpriteKen
+        },
+        {
+            name : "ryu",
+            configuration:ryuConfiguration,
+            spriteSheet: SpriteRyu
+        }
     ];
+
+    /**
+     *
+     * @param characterName
+     * @return {{name:string,configuration:*,spriteSheet:string}}
+     * @private
+     */
+    static _getCharacter(characterName){
+        characterName = characterName.toLowerCase();
+
+        let character = CharacterFactory.playersAvailable.find(player => player.name.toLocaleLowerCase() === characterName);
+
+        if (!character)
+            throw new Error(`unknown user with name ${characterName}`);
+
+        return character;
+    }
+
+    /**
+     *
+     * @param {string} characterName
+     */
+    static getCharacterConfiguration(characterName){
+        return CharacterFactory._getCharacter(characterName);
+    }
 
     /**
      *
@@ -21,21 +59,10 @@ export default class characterFactory {
     static getCharacter(characterName, params={}) {
         let playerConfig, spriteSheet;
 
-        characterName = characterName.toLowerCase();
+        let character = CharacterFactory._getCharacter(characterName);
 
-        if (!characterFactory.playersAvailable.find(playerName => playerName === characterName))
-            throw new Error(`unknown user with name ${characterName}`);
-
-        switch (characterName){
-            case "ken":
-                playerConfig = kenConfiguration;
-                spriteSheet = SpriteKen;
-            break;
-            case "ryu":
-                playerConfig = ryuConfiguration;
-                spriteSheet = SpriteRyu;
-            break;
-        }
+        playerConfig = character.configuration;
+        spriteSheet = character.spriteSheet;
 
 
         return new player({

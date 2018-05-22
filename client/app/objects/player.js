@@ -14,6 +14,12 @@ export default class Player {
     debugHitBoxes = [];
 
     /**
+     * vector for leftTurned or not
+     * @type {number}
+     */
+    vector = 1;
+
+    /**
      * show hitBoxes
      * @type {boolean}
      */
@@ -29,6 +35,33 @@ export default class Player {
 
     get debug() {
         return this._debug;
+    }
+
+    /**
+     * @type {number}
+     * @private
+     */
+    _scaleX = 1;
+    set scaleX(scaleX){
+        this._scaleX = scaleX;
+        this.sprite.scale.x = this._scaleX;
+    }
+
+    get scaleX(){
+        return this._scaleX
+    }
+    /**
+     * @type {number}
+     * @private
+     */
+    _scaleY = 1;
+    set scaleY(scaleY){
+        this._scaleY = scaleY;
+        this.sprite.scale.y = this._scaleY;
+    }
+
+    get scaleY(){
+        return this._scaleY
     }
 
     static ID = 0;
@@ -107,7 +140,16 @@ export default class Player {
         block  : "'"
     };
 
-    isLeftTurned = false;
+    _isLeftTurned = false;
+
+    get isLeftTurned(){
+        return this._isLeftTurned;
+    }
+
+    set isLeftTurned(isLeftTurned){
+        this._isLeftTurned = isLeftTurned;
+        this.vector = isLeftTurned? -1 : 1;
+    }
 
     constructor(params = {}) {
         this.id = Player.ID++;
@@ -143,7 +185,9 @@ export default class Player {
     destroy() {
         this.stage.app.stage.removeChild(this.sprite);
         this.stage.app.ticker.remove(this.tick);
-        super.destroy(true);
+        this.sprite.destroy(true);
+        if(this.debug)
+            this.removeHitBoxes();
     }
 
     getBounds() {
@@ -171,7 +215,14 @@ export default class Player {
         }
 
         let playerBounds = this.getBounds();
-        return {...bounds, x: bounds.x + playerBounds.x+(this.isLeftTurned?0:playerBounds.width), y: bounds.y + playerBounds.y};
+        // bounds.x - playerBounds.width - bounds.width
+        let x;
+        if(this.isLeftTurned)
+            x = bounds.x - playerBounds.width - bounds.width;
+        else
+            x = bounds.x + playerBounds.x + playerBounds.width;
+
+        return {...bounds, x, y: bounds.y + playerBounds.y};
     }
 
     drawHitBoxes() {
@@ -181,8 +232,6 @@ export default class Player {
         let bounds;
         switch (this.sprite.animation.name) {
             case "kick":
-                bounds = this.getAttackBounds(this.sprite.animation.name);
-                break;
             case "punch" :
                 bounds = this.getAttackBounds(this.sprite.animation.name);
                 break;
@@ -220,7 +269,10 @@ export default class Player {
     }
 
     removeHitBoxes() {
-        this.debugHitBoxes.forEach(hitBox => hitBox.destroy());
+        this.debugHitBoxes.forEach(hitBox => {
+            hitBox.parent.removeChild(hitBox);
+            hitBox.destroy();
+        });
     }
 
     initCharacter() {
@@ -234,7 +286,7 @@ export default class Player {
         // init the SpriteSheet
         // let spriteSheet = new createjs.SpriteSheet(this.spriteSheetDatas);
 
-        let vector = this.isLeftTurned ? -1 : 1;
+        // let vector = this.isLeftTurned ? -1 : 1;
 
         // Init the sprite
         // let character = new createjs.Sprite(spriteSheet, "stand");
@@ -246,11 +298,11 @@ export default class Player {
         // this.stage.renderer.render(stage);
 
         // Set the position of the image in the canvas
-        this.x = this.stage.stage.width / 2 + (this.width * 3 * -vector);
+        this.x = this.stage.stage.width / 2 + (this.width * 3 * -this.vector);
         this.y = this.stage.stage.height - this.height;
         this.x = 0;
         this.y = 0;
-        this.scaleX = vector;
+        this.scaleX = this.vector;
         this.scaleY = 1;
 
         //set the animation

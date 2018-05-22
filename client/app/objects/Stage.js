@@ -5,7 +5,7 @@ import ToulouseYnovCampusPNG from "../assets/images/Toulouse-YnovCampus.png";
 import SpriteKen             from "../assets/characters/ken/sprite.png";
 import SpriteRyu             from "../assets/images/spriteRyu.png";
 import SpriteHadoken         from "../assets/images/hadoken.png";
-import characterFactory      from "./characters/factory";
+import CharacterFactory      from "./characters/factory";
 import Ken                   from "./characters/ken";
 import EventEmitter          from "./EventEmitter";
 import Player                from "./player";
@@ -18,6 +18,11 @@ export default class Stage extends EventEmitter {
 
     partyFinish = false;
     players = [];
+
+    /**
+     * @type {Player[]}
+     */
+    testPlayers;
 
     keyPressed = [];
     keyLocked = [
@@ -149,7 +154,7 @@ export default class Stage extends EventEmitter {
 
             this.setBackground(ToulouseYnovCampusPNG);
 
-            // let player = characterFactory.getCharacter("ken", {
+            // let player = CharacterFactory.getCharacter("ken", {
             //     isLeftTurned: false
             // });
 
@@ -187,7 +192,7 @@ export default class Stage extends EventEmitter {
 
     }
 
-    checkCharacter = (charName) => {
+    checkCharacter = (charName, isLeftTurned = false) => {
 
         if(this.testPlayers){
             this.testPlayers.forEach(player => {
@@ -195,22 +200,24 @@ export default class Stage extends EventEmitter {
             });
         }
         let players = [];
-        let player = characterFactory.getCharacter(charName);
+        let character = CharacterFactory.getCharacterConfiguration(charName);
 
-        players.push(player);
         let x = 0;
 
         //get one player by animations
-        for (let name in player.sprite.animations) {
-            let curPlayer = characterFactory.getCharacter(charName);
+        for (let name in character.configuration.animations) {
+            let curPlayer = CharacterFactory.getCharacter(charName, {
+                isLeftTurned
+            });
             curPlayer.initCharacter();
 
             curPlayer.sprite.animationLocked = true;
 
+            // noinspection JSUnfilteredForInLoop
             curPlayer.sprite.setAnimation(name);
 
             curPlayer.debug = true;
-            curPlayer.x = x;
+            curPlayer.x = x+(isLeftTurned?curPlayer.width:0);
 
             x += curPlayer.sprite.getBounds().width + 50;
             players.push(curPlayer);
