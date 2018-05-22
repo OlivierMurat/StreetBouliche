@@ -26,11 +26,17 @@ export default class StageCanvas extends React.Component {
         this.stage.init();
         document.addEventListener("keydown", (event) => this.handleKeyDown(event));
         document.addEventListener("keyup", (event) => this.handleKeyUp(event));
+        window.addEventListener('resize', this.resizeHandler);
     }
+
+    resizeHandler = ()=>{
+        this.stage.resize();
+    };
 
     componentWillUnmount() {
         document.removeEventListener("keydown", (event) => this.handleKeyDown(event));
         document.removeEventListener("keyup", (event) => this.handleKeyUp(event));
+        window.removeEventListener('resize', this.resizeHandler, true);
 
         this.stage.destroy();
     }

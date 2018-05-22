@@ -1,8 +1,8 @@
-import AnimatedSprite from "./AnimatedSprite";
-import Hadoken        from "./specialAttacks/Hadoken";
-import Stage          from "./Stage";
-import * as PIXI      from "pixi.js";
-
+import AnimatedSprite                   from "./AnimatedSprite";
+import Hadoken                          from "./specialAttacks/Hadoken";
+import Stage                            from "./Stage";
+import * as PIXI                        from "pixi.js";
+import {calculateAspectRatioFit, ratio} from "./utils";
 
 export default class Player {
     // specialAttack = new Hadoken();
@@ -12,6 +12,78 @@ export default class Player {
      * @type {PIXI.Graphics[]}
      */
     debugHitBoxes = [];
+
+    _referenceWidth = 300;
+    set referenceWidth(width){
+        if(!width)
+            width = this._referenceWidth;
+
+        // check for percent ( contain %, or is between 0 and 1 )
+        let percent = width.toString().match(/([0-9]{1,3})%/);
+        if(percent || (width > 0 && width < 1)){
+            //its a percentage
+            if(percent){
+                percent = parseFloat(percent[1]);
+            }
+        }
+        else{
+            percent = width/this._ratioSaveSize.width;
+        }
+
+        this._referenceWidth = percent;
+    }
+
+    get referenceWidth(){
+        return this._referenceWidth;
+    }
+
+    _referenceHeight = 150;
+    set referenceHeight(height){
+        if(!height)
+            height = this._referenceHeight;
+        // check for percent ( contain %, or is between 0 and 1 )
+        let percent = height.toString().match(/([0-9]{1,3})%/);
+        if(percent || (height > 0 && height < 1)){
+            //its a percentage
+            if(percent){
+                percent = parseFloat(percent[1]);
+            }
+        }
+        else{
+            percent = height/this._ratioSaveSize.width;
+        }
+
+        this._referenceHeight = percent;
+    }
+
+    get referenceHeight(){
+        return this._referenceHeight;
+    }
+
+    _ratioSaveSize = {
+        width:0,
+        height:0
+    };
+    _ratioHeight;
+    _ratioWidth;
+    _calculateRatio(){
+        let _ratioSaveSize = {
+            width:this.stage.app.stage.width,
+            height:this.stage.app.stage.height
+        };
+
+        //skip calculation
+        if(this._ratioSaveSize === _ratioSaveSize)
+            return;
+
+        this._ratioSaveSize = _ratioSaveSize;
+
+        let bounds = this.getBounds();
+
+        let fit = calculateAspectRatioFit(bounds.width, bounds.height, this.referenceWidth, this.referenceHeight);
+        this._ratioWidth = this.scaleX = fit.width;
+        this._ratioHeight = this.scaleY = fit.height;
+    }
 
     /**
      * vector for leftTurned or not
@@ -169,11 +241,14 @@ export default class Player {
         });
         // this.setAnimations(this.config.animations);
         this.name = this.config.name;
-        this.width = this.config.width;
-        this.height = this.config.height;
         this.punch = this.config.punch;
         this.kick = this.config.kick;
         // this.kick = this.config.kick;
+
+        this.referenceWidth = this.config.referenceWidth;
+        this.referenceHeight = this.config.referenceHeight;
+        this.width = this.config.width*this._ratioWidth;
+        this.height = this.config.height*this._ratioWidth;
 
         this.stage = Stage.Instance;
         this.stage.app.stage.addChild(this.sprite);

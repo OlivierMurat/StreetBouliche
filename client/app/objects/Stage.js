@@ -121,6 +121,24 @@ export default class Stage extends EventEmitter {
         // this.stage.update();
     };
 
+    resize(){
+        //reset style css to get client size
+        this.app.view.style.width = null;
+        this.app.view.style.height = null;
+
+
+        this.app.view.width = this.app.view.clientWidth;
+        this.app.view.height = this.app.view.clientHeight;
+        this.app.renderer.resize(this.app.view.clientWidth, this.app.view.clientHeight);
+        // this.app.renderer.resize(this.app.view.clientWidth, this.app.view.clientHeight);
+
+        //resize background
+        this.background = this.background;
+
+        //resize players
+        this.players.forEach(player => player._calculateRatio());
+    }
+
     thisPlayerLoose(player) {
         let winner = this.children.find(child => child.o.walk && !(child.o === player));
         console.log("we have a winner");
@@ -152,7 +170,7 @@ export default class Stage extends EventEmitter {
             // document.getElementById("canvas").stage = this.stage;
             this.startMusic();
 
-            this.setBackground(ToulouseYnovCampusPNG);
+            this.background = ToulouseYnovCampusPNG;
 
             // let player = CharacterFactory.getCharacter("ken", {
             //     isLeftTurned: false
@@ -247,7 +265,13 @@ export default class Stage extends EventEmitter {
         // return this.stage.update(...args);
     }
 
-    setBackground(background) {
+    _background;
+    get background(){
+        return this._background;
+    }
+
+    set background(background){
+        this._background = background;
 
         let texture = PIXI.utils.TextureCache[background];
 
@@ -276,19 +300,5 @@ export default class Stage extends EventEmitter {
 
         // Add the bunny to the scene we are building
         this.app.stage.addChild(this.backgroundSprite);
-
-        // let bg = new createjs.Bitmap(background);
-        // bg.regX = 0;
-        // bg.regY = 0;
-        // bg.scaleX = 0.19;
-        // bg.scaleY = 0.19;
-        // bg.x = 0;
-        // bg.y = 0;
-        //
-        // bg.image.onload = () => {
-        //     this.update();
-        // };
-        //
-        // this.stage.addChild(bg);
     }
 }
