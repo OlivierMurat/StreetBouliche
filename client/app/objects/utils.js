@@ -38,3 +38,29 @@ export function calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight
 
     return { width: srcWidth*ratio, height: srcHeight*ratio };
 }
+
+/**
+ *
+ * @param {string} string the percentage to parse
+ * @param {Number} reference The full number to get a percent
+ * @return {Number} return a float according to the string
+ */
+export function getPercentFromString(string, reference){
+    let percentMatch = string.toString().match(/([0-9]{1,3})%/);
+    let percent;   
+    if(percentMatch || (string > 0 && string < 1)){
+        //its a percentage
+        if(percentMatch){
+            /**
+             *
+             * @type {number}
+             */
+            percent = parseFloat(percentMatch[1]);
+        }
+    }
+    else{
+        percent = string/reference;
+    }
+
+    return percent;
+}

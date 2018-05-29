@@ -1,8 +1,8 @@
-import AnimatedSprite                   from "./AnimatedSprite";
-import Hadoken                          from "./specialAttacks/Hadoken";
-import Stage                            from "./Stage";
-import * as PIXI                        from "pixi.js";
-import {calculateAspectRatioFit, ratio} from "./utils";
+import AnimatedSprite                                         from "./AnimatedSprite";
+import Hadoken                                                from "./specialAttacks/Hadoken";
+import Stage                                                  from "./Stage";
+import * as PIXI                                              from "pixi.js";
+import {calculateAspectRatioFit, getPercentFromString, ratio} from "./utils";
 
 export default class Player {
     // specialAttack = new Hadoken();
@@ -13,47 +13,28 @@ export default class Player {
      */
     debugHitBoxes = [];
 
-    _referenceWidth = 300;
+    _referenceWidth;
+    _defaultReferenceWidth = 300;
     set referenceWidth(width){
         if(!width)
-            width = this._referenceWidth;
+            width = this._defaultReferenceWidth;
 
-        // check for percent ( contain %, or is between 0 and 1 )
-        let percent = width.toString().match(/([0-9]{1,3})%/);
-        if(percent || (width > 0 && width < 1)){
-            //its a percentage
-            if(percent){
-                percent = parseFloat(percent[1]);
-            }
-        }
-        else{
-            percent = width/this._ratioSaveSize.width;
-        }
-
-        this._referenceWidth = percent;
+        this._referenceWidth = width;
     }
 
     get referenceWidth(){
         return this._referenceWidth;
     }
 
-    _referenceHeight = 150;
+
+
+    _referenceHeight;
+    _defaultReferenceHeight = 150;
     set referenceHeight(height){
         if(!height)
-            height = this._referenceHeight;
-        // check for percent ( contain %, or is between 0 and 1 )
-        let percent = height.toString().match(/([0-9]{1,3})%/);
-        if(percent || (height > 0 && height < 1)){
-            //its a percentage
-            if(percent){
-                percent = parseFloat(percent[1]);
-            }
-        }
-        else{
-            percent = height/this._ratioSaveSize.width;
-        }
+            height = this._defaultReferenceHeight;
 
-        this._referenceHeight = percent;
+        this._referenceHeight = height;
     }
 
     get referenceHeight(){
@@ -66,23 +47,20 @@ export default class Player {
     };
     _ratioHeight;
     _ratioWidth;
-    _calculateRatio(){
+    _screenScaleUpdate(){
         let _ratioSaveSize = {
             width:this.stage.app.stage.width,
             height:this.stage.app.stage.height
         };
 
-        //skip calculation
-        if(this._ratioSaveSize === _ratioSaveSize)
-            return;
-
-        this._ratioSaveSize = _ratioSaveSize;
-
         let bounds = this.getBounds();
-
         let fit = calculateAspectRatioFit(bounds.width, bounds.height, this.referenceWidth, this.referenceHeight);
-        this._ratioWidth = this.scaleX = fit.width;
-        this._ratioHeight = this.scaleY = fit.height;
+
+        let height = getPercentFromString(this._referenceHeight, this.stage.app.stage.height)*this.stage.app.stage.height;
+        let width = getPercentFromString(this._referenceWidth, this.stage.app.stage.width)*this.stage.app.stage.width;
+
+        console.log(height, width);
+        debugger;
     }
 
     /**
@@ -247,8 +225,8 @@ export default class Player {
 
         this.referenceWidth = this.config.referenceWidth;
         this.referenceHeight = this.config.referenceHeight;
-        this.width = this.config.width*this._ratioWidth;
-        this.height = this.config.height*this._ratioWidth;
+        this.width = this.config.width;
+        this.height = this.config.height;
 
         this.stage = Stage.Instance;
         this.stage.app.stage.addChild(this.sprite);

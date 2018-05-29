@@ -80,7 +80,7 @@ export default class Stage extends EventEmitter {
 
         //add all assets to preload
         this.loader
-            // .add("ToulouseYnovCampusPNG", ToulouseYnovCampusPNG)
+            .add("ToulouseYnovCampusPNG", ToulouseYnovCampusPNG)
             .add("SpriteHadoken", SpriteHadoken)
             .add("Sprite-ken", SpriteKen)
             .add("Sprite-ryu", SpriteRyu)
@@ -122,6 +122,7 @@ export default class Stage extends EventEmitter {
     };
 
     resize(){
+        console.log("resize");
         //reset style css to get client size
         this.app.view.style.width = null;
         this.app.view.style.height = null;
@@ -136,7 +137,9 @@ export default class Stage extends EventEmitter {
         this.background = this.background;
 
         //resize players
-        this.players.forEach(player => player._calculateRatio());
+        this.players.forEach(player => {
+            player._screenScaleUpdate();
+        });
     }
 
     thisPlayerLoose(player) {
@@ -239,6 +242,7 @@ export default class Stage extends EventEmitter {
 
             x += curPlayer.sprite.getBounds().width + 50;
             players.push(curPlayer);
+            this.players.push(curPlayer);
         }
         this.testPlayers = players;
     };
